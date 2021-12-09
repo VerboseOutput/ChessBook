@@ -1,0 +1,14 @@
+black_knight.png filter=lfs diff=lfs merge=lfs -text
+black_rook.png filter=lfs diff=lfs merge=lfs -text
+chessboard.png filter=lfs diff=lfs merge=lfs -text
+white_knight.png filter=lfs diff=lfs merge=lfs -text
+black_bishop.png filter=lfs diff=lfs merge=lfs -text
+black_pawn.png filter=lfs diff=lfs merge=lfs -text
+white_king.png filter=lfs diff=lfs merge=lfs -text
+white_pawn.png filter=lfs diff=lfs merge=lfs -text
+white_queen.png filter=lfs diff=lfs merge=lfs -text
+white_rook.png filter=lfs diff=lfs merge=lfs -text
+black_king.png filter=lfs diff=lfs merge=lfs -text
+black_queen.png filter=lfs diff=lfs merge=lfs -text
+flipped_chessboard.png filter=lfs diff=lfs merge=lfs -text
+white_bishop.png filter=lfs diff=lfs merge=lfs -text
