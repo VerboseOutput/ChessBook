@@ -4,7 +4,9 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
 
 from context import resources
 from square_board import SquareBoardWidget
+
 import hichess
+from hichess import EngineWrapper
 
 # QMainWindow provides the framework for building an applications top level interface
 class Window(QMainWindow):
@@ -13,14 +15,12 @@ class Window(QMainWindow):
 
         # Setup hichess widget
         self.boardWidget = SquareBoardWidget()
+
         board = self.boardWidget.board()
+        board.accessibleSides = hichess.ONLY_WHITE_SIDE
+        board.dragAndDrop = True
 
-        self.mainLayout = QGridLayout()
-        self.mainLayout.addWidget(self.boardWidget, 1, 1)
-
-        self.centralWidget = QWidget()
-        self.centralWidget.setLayout(self.mainLayout)
-        self.setCentralWidget(self.centralWidget)
+        self.setCentralWidget(self.boardWidget)
 
         self.setWindowTitle("ChessBook")
         self.resize(width, height)
