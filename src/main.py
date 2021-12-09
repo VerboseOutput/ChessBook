@@ -1,8 +1,6 @@
 import sys
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
-from PySide2.QtCore import QFile, QTextStream
-from PySide2.QtGui import QPixmap
 
 from context import resources
 from square_board import SquareBoardWidget

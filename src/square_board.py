@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QGridLayout, QWidget, QSizePolicy
-from PySide2.QtCore import QFile, QTextStream
-from PySide2.QtGui import QPixmap, QPainter, QColor
+from PySide2.QtWidgets import QWidget, QSizePolicy
+from PySide2.QtCore import QFile, QTextStream, QRect
+from PySide2.QtGui import QPixmap
 
 from hichess.hichess import BoardWidget
 
@@ -16,8 +16,8 @@ class SquareBoardWidget(QWidget):
         # this needs to happen before setting the board pixmap
         board.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        boardSize = self._boardSize(self.rect().width(), self.rect().height())
-        board.setFixedSize(boardSize, boardSize)
+        boardGeo = self._boardGeo(self.rect().width(), self.rect().height())
+        board.setGeometry(boardGeo)
 
         # setup board and pieces
         board.setBoardPixmap(defaultPixmap=QPixmap(":/images/chessboard.png"),
@@ -32,19 +32,17 @@ class SquareBoardWidget(QWidget):
     def board(self):
         return self.boardWidget
 
-    def _resizeBoard(self, size):
-        self.boardWidget.setFixedSize(size, size)
-
-    def _boardSize(self, width, height):
-        return width if width < height else height
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        # TODO: fill entire widget area with red for debugging
-        #       remove
-        painter.fillRect(self.rect(), QColor(64, 0, 0)) 
-
     def resizeEvent(self, event):
         widgetSize = event.size()
-        boardSize = self._boardSize(widgetSize.width(), widgetSize.height())
-        self._resizeBoard(boardSize)
+        boardGeo = self._boardGeo(widgetSize.width(), widgetSize.height())
+        
+        self.boardWidget.setGeometry(boardGeo)
+
+    def _boardGeo(self, widgetWidth, widgetHeight) -> QRect:
+        """maximize board size while maintaining square aspect ratio and centering"""
+
+        boardSize = widgetWidth if widgetWidth < widgetHeight else widgetHeight
+        boardX = (widgetWidth - boardSize) / 2  
+        boardY = (widgetHeight - boardSize) / 2
+
+        return QRect(boardX, boardY, boardSize, boardSize)
