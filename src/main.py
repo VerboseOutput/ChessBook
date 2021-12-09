@@ -1,12 +1,12 @@
 import sys
 
-import hichess
-
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
 from PySide2.QtCore import QFile, QTextStream
 from PySide2.QtGui import QPixmap
 
 from context import resources
+from square_board import SquareBoardWidget
+import hichess
 
 # QMainWindow provides the framework for building an applications top level interface
 class Window(QMainWindow):
@@ -14,23 +14,15 @@ class Window(QMainWindow):
         super().__init__()
 
         # Setup hichess widget
-        self.boardWidget = hichess.BoardWidget()
-        self.boardWidget.accessibleSides = hichess.BOTH_SIDES
-        self.boardWidget.dragAndDrop = True
+        self.boardWidget = SquareBoardWidget()
+        board = self.boardWidget.board()
 
-        # background image
-        self.boardWidget.setBoardPixmap(defaultPixmap=QPixmap(":/images/chessboard.png"),
-                                        flippedPixmap=QPixmap(":/images/flipped_chessboard.png"))
+        self.mainLayout = QGridLayout()
+        self.mainLayout.addWidget(self.boardWidget, 1, 1)
 
-        # qss
-        qss = QFile(":/styles/styles.css")
-        if qss.open(QFile.ReadOnly):
-            textStream = QTextStream(qss)
-            self.boardWidget.setStyleSheet(textStream.readAll())
-        else:
-            print(f"failed to open{qss.fileName()}")
-
-        self.setCentralWidget(self.boardWidget)
+        self.centralWidget = QWidget()
+        self.centralWidget.setLayout(self.mainLayout)
+        self.setCentralWidget(self.centralWidget)
 
         self.setWindowTitle("ChessBook")
         self.resize(width, height)
