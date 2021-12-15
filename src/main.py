@@ -1,9 +1,10 @@
 import sys
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
+from PySide2.QtGui import QGuiApplication
 
 from context import resources
-from square_board import SquareBoardWidget
+from analysis_page import AnalysisPage
 
 import hichess
 from hichess import EngineWrapper
@@ -14,13 +15,9 @@ class Window(QMainWindow):
         super().__init__()
 
         # Setup hichess widget
-        self.boardWidget = SquareBoardWidget()
+        self.analysisPage = AnalysisPage()
 
-        board = self.boardWidget.board()
-        board.accessibleSides = hichess.ONLY_WHITE_SIDE
-        board.dragAndDrop = True
-
-        self.setCentralWidget(self.boardWidget)
+        self.setCentralWidget(self.analysisPage)
 
         self.setWindowTitle("ChessBook")
         self.resize(width, height)
@@ -29,7 +26,7 @@ class Window(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    screen_resolution = app.desktop().screenGeometry()
+    screen_resolution = QGuiApplication.primaryScreen().availableGeometry()
     width, height = screen_resolution.width(), screen_resolution.height()
     scale = 0.8
     window = Window(int(width * scale), int(height * scale))
