@@ -2,6 +2,7 @@ from PySide2.QtWidgets import QWidget, QLabel, QGridLayout
 from PySide2.QtCore import Qt
 import hichess
 from chess import pgn
+import chess
 
 from square_board import SquareBoardWidget
 
@@ -15,7 +16,8 @@ class AnalysisPage(QWidget):
         #
         # each node can return a chess.Board representation of the current state
         # add a new move after the current one using add_variation()
-        game = pgn.Game()
+        self.gameRoot = pgn.Game()
+        self.currentNode = self.gameRoot
 
         # Setup Board Widget
         self.sqBoardWidget = SquareBoardWidget()
@@ -39,6 +41,9 @@ class AnalysisPage(QWidget):
         self.setLayout(layout)
 
     def _onMoveMade(self, move: str):
-        self.moveNotes.setText(self.moveNotes.text() + " " + move)
+        move = self.sqBoardWidget.peekMove()
+        self.currentNode.add_variation(move)
+        self.currentNode = self.currentNode.next()
+        print(self.currentNode.board())
 
     

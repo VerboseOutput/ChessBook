@@ -8,9 +8,8 @@ class SquareBoardWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        # create hichess board widget
+        # create hichess board widget, with this widget as its parent
         board = BoardWidget(self)
-        self.boardWidget = board
 
         # resize it to be square and centered within its parent widget
         # this needs to happen before setting the board pixmap
@@ -29,8 +28,14 @@ class SquareBoardWidget(QWidget):
         else:
             print(f"failed to open{qss.fileName()}")
 
-    def board(self):
-        return self.boardWidget
+        self._boardWidget = board
+
+    @property
+    def boardWidget(self):
+        return self._boardWidget
+
+    def peekMove(self):
+        return self._boardWidget.board.peek()
 
     def resizeEvent(self, event):
         widgetSize = event.size()
