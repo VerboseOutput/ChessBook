@@ -1,13 +1,12 @@
 import sys
 
-from PySide2.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
+from PySide2.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from PySide2.QtGui import QGuiApplication
 
 from context import resources
 from analysis_page import AnalysisPage
+from flow_layout import FlowLayout
 
-import hichess
-from hichess import EngineWrapper
 
 # QMainWindow provides the framework for building an applications top level interface
 class Window(QMainWindow):
