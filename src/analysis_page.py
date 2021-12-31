@@ -3,6 +3,7 @@ from PySide2.QtCore import Qt
 import hichess
 from chess import pgn
 import chess
+from move_notes import MoveNotesWidget
 
 from square_board import SquareBoardWidget
 
@@ -11,13 +12,13 @@ class AnalysisPage(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        # games are represented by a tree of pgn.GameNodes, with the root node
+        # games are represented by a tree of pgn.GameNodes (an abstract base class), with the root node
         # being a special subclass of GameNode, Game, with some additional header info
+        # all nodes after the root will be of "ChildNode" type
         #
         # each node can return a chess.Board representation of the current state
         # add a new move after the current one using add_variation()
-        self.gameRoot = pgn.Game()
-        self.currentNode = self.gameRoot
+        self.gameNode = pgn.Game()
 
         # Setup Board Widget
         self.sqBoardWidget = SquareBoardWidget()
@@ -29,7 +30,7 @@ class AnalysisPage(QWidget):
         boardWidget.moveMade.connect(self._onMoveMade)
 
         # placeholder labels for future widgets
-        self.moveNotes = QLabel("TODO: move notes")
+        self.moveNotes = MoveNotesWidget()
         self.lines = QLabel("TODO: engine lines")
 
         # layout the page's widgets
@@ -40,10 +41,18 @@ class AnalysisPage(QWidget):
 
         self.setLayout(layout)
 
-    def _onMoveMade(self, move: str):
+    def _onMoveMade(self, _):
+        """handle user move input via the board widget"""
+
+        # get the latest move from our board widget
         move = self.sqBoardWidget.peekMove()
-        self.currentNode.add_variation(move)
-        self.currentNode = self.currentNode.next()
-        print(self.currentNode.board())
+
+        # update our source of truth for the game state
+        self.gameNode = self.gameNode.add_variation(move)
+
+        # update our notes with the latest move
+        self.moveNotes.addMove(self.gameNode)
+
+
 
     
