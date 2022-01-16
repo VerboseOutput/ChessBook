@@ -1,70 +1,101 @@
-from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
+from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSizePolicy, QGridLayout
+from PySide2.QtGui import QPainter, QColor, QFont, QFontDatabase
 from chess import pgn, WHITE, BLACK
 
 from flow_layout import FlowLayout
 
 class MoveWidget(QLabel):
-    WIDTH = 5
     def __init__(self) -> None:
         super().__init__()
 
         self.setText("")
         self.node = None
 
-    def setText(self, text: str):
-        text = text.ljust(MoveWidget.WIDTH)
-        super().setText(text)
+        font = QFont("Monaco", 16, QFont.Bold)
+        self.setFont(font)
 
-    def setNode(self, node: pgn.ChildNode):
+    def set_node(self, node: pgn.ChildNode):
         self.node = node
         self.setText(self.node.san())
 
-    def isSet(self) -> bool:
+    def is_set(self) -> bool:
         return self.node is not None
+
+    # def paintEvent(self, event):
+    #     painter = QPainter(self)
+    #     # TODO: fill entire widget area with blue for debugging
+    #     #       remove
+    #     painter.fillRect(self.rect(), QColor(0, 0, 200)) 
+
 
 class TurnWidget(QWidget):
     def __init__(self, moveNum: int) -> None:
         super().__init__()
 
-        self.whiteMove = MoveWidget()
-        self.blackMove = MoveWidget()
+        self.white_move = MoveWidget()
+        self.black_move = MoveWidget()
 
         layout = QHBoxLayout()
-        layout.addWidget(QLabel(str(moveNum) + ". "))
-        layout.addWidget(self.whiteMove)
-        layout.addWidget(self.blackMove)
+        layout.setContentsMargins(0,0,0,0)
+        layout.setSpacing(8)
+        
+        move_num = QLabel(str(moveNum) + ".")
+        move_num.setStyleSheet("QLabel { color : #C0C0C0; }")
+        font = QFont("Monaco", 16)
+        move_num.setFont(font)
+        
+        layout.addWidget(move_num)
+        
+        layout.addWidget(self.white_move)
+        layout.addWidget(self.black_move)
         
         self.setLayout(layout)
 
     def setWhiteMove(self, node: pgn.ChildNode):
-        self.whiteMove.setNode(node)
+        self.white_move.set_node(node)
 
     def setBlackMove(self, node: pgn.ChildNode):
-        if not self.whiteMove.isSet():
-            self.whiteMove.setText("...")
-        self.blackMove.setNode(node)
+        if not self.white_move.is_set():
+            self.white_move.setText("...")
+        self.black_move.set_node(node)
+
+
     
+class LineWidget(QWidget):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.turn_number = 1
+        self.curr_turn = None
+        self.layout = FlowLayout()
+
+        self.setLayout(self.layout)
+
+    def add_move(self, node: pgn.ChildNode):
+        if node.turn() is BLACK: # means this node was WHITE'S move
+            self.curr_turn = TurnWidget(self.turn_number)
+            self.curr_turn.setWhiteMove(node)
+
+            self.layout.addWidget(self.curr_turn)
+
+        else:
+            self.curr_turn.setBlackMove(node)
+            self.turn_number += 1
 
 class MoveNotesWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        self.turnNumber = 1
-        self.currTurn = None
-
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
+
+        self.curr_line = LineWidget()
+        self.layout.addWidget(self.curr_line)
+        
+
         self.setLayout(self.layout)
 
-
-    def addMove(self, node: pgn.ChildNode):
-        if node.turn() is BLACK: # means this node was WHITE'S move
-            self.currTurn = TurnWidget(self.turnNumber)
-            self.currTurn.setWhiteMove(node)
-
-            self.layout.addWidget(self.currTurn)
-
-        else:
-            self.currTurn.setBlackMove(node)
-            self.turnNumber += 1
+    def add_move(self, node: pgn.ChildNode):
+        self.curr_line.add_move(node)
 
 
