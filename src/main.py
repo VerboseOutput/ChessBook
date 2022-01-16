@@ -14,9 +14,9 @@ class Window(QMainWindow):
         super().__init__()
 
         # Setup hichess widget
-        self.analysisPage = AnalysisPage()
+        self.analysis_page = AnalysisPage()
 
-        self.setCentralWidget(self.analysisPage)
+        self.setCentralWidget(self.analysis_page)
 
         self.setWindowTitle("ChessBook")
         self.resize(width, height)

@@ -31,17 +31,17 @@ class SquareBoardWidget(QWidget):
         self._boardWidget = board
 
     @property
-    def boardWidget(self):
+    def board_widget(self):
         return self._boardWidget
 
-    def peekMove(self):
+    def peek_move(self):
         return self._boardWidget.board.peek()
 
     def resizeEvent(self, event):
         widgetSize = event.size()
         boardGeo = self._boardGeo(widgetSize.width(), widgetSize.height())
         
-        self.boardWidget.setGeometry(boardGeo)
+        self.board_widget.setGeometry(boardGeo)
 
     def _boardGeo(self, widgetWidth, widgetHeight) -> QRect:
         """maximize board size while maintaining square aspect ratio and centering"""

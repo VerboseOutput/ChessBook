@@ -18,40 +18,40 @@ class AnalysisPage(QWidget):
         #
         # each node can return a chess.Board representation of the current state
         # add a new move after the current one using add_variation()
-        self.gameNode = pgn.Game()
+        self.game_node = pgn.Game()
 
         # Setup Board Widget
-        self.sqBoardWidget = SquareBoardWidget()
+        self.sq_board_widget = SquareBoardWidget()
 
-        boardWidget = self.sqBoardWidget.boardWidget
-        boardWidget.accessibleSides = hichess.BOTH_SIDES
-        boardWidget.dragAndDrop = True
+        board_widget = self.sq_board_widget.board_widget
+        board_widget.accessibleSides = hichess.BOTH_SIDES
+        board_widget.dragAndDrop = True
 
-        boardWidget.moveMade.connect(self._onMoveMade)
+        board_widget.moveMade.connect(self._on_move_made)
 
         # placeholder labels for future widgets
-        self.moveNotes = MoveNotesWidget()
+        self.move_notes = MoveNotesWidget()
         self.lines = QLabel("TODO: engine lines")
 
         # layout the page's widgets
         layout = QGridLayout()
-        layout.addWidget(self.sqBoardWidget, 0, 0)
-        layout.addWidget(self.moveNotes, 0, 1, 2, 1, Qt.AlignHCenter | Qt.AlignTop)
-        layout.addWidget(self.lines, 1, 0,Qt.AlignHCenter | Qt.AlignTop)
+        layout.addWidget(self.sq_board_widget, 0, 0)
+        layout.addWidget(self.move_notes, 0, 1, 2, 1)
+        layout.addWidget(self.lines, 1, 0, Qt.AlignHCenter | Qt.AlignTop)
 
         self.setLayout(layout)
 
-    def _onMoveMade(self, _):
+    def _on_move_made(self, _):
         """handle user move input via the board widget"""
 
         # get the latest move from our board widget
-        move = self.sqBoardWidget.peekMove()
+        move = self.sq_board_widget.peek_move()
 
         # update our source of truth for the game state
-        self.gameNode = self.gameNode.add_variation(move)
+        self.game_node = self.game_node.add_variation(move)
 
         # update our notes with the latest move
-        self.moveNotes.addMove(self.gameNode)
+        self.move_notes.add_move(self.game_node)
 
 
 
