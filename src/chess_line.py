@@ -54,22 +54,23 @@ class TurnWidget(QWidget):
 
     
 class LineWidget(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, turn_num: int = 1) -> None:
         super().__init__()
 
-        self.turn_number = 1
+        self.turn_number = turn_num
         self.curr_turn = None
         self.layout = FlowLayout()
 
         self.setLayout(self.layout)
 
     def add_move(self, node: pgn.ChildNode):
-        if node.turn() is BLACK: # means this node was WHITE'S move
+        if self.curr_turn is None:
             self.curr_turn = TurnWidget(self.turn_number)
-            self.curr_turn.setWhiteMove(node)
-
             self.layout.addWidget(self.curr_turn)
 
+        if node.turn() is BLACK: # means this node was WHITE'S move
+            self.curr_turn.setWhiteMove(node)
         else:
             self.curr_turn.setBlackMove(node)
             self.turn_number += 1
+            self.curr_turn = None
