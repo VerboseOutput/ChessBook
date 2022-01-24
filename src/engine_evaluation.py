@@ -88,7 +88,7 @@ class EngineEvaluationWidget(QWidget):
         v_index = multipv - 1
 
         white_score = relative_score.white() # always get the score from white's point of view
-        self.score[v_index].setText(str(white_score.score())) 
+        self.score[v_index].setText(str(white_score.score() / 100.0)) 
 
         # replace the current line widget
         dummy = QWidget()
