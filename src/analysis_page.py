@@ -59,6 +59,6 @@ class AnalysisPage(QWidget):
         self.move_notes.add_move(self.game_node)
 
         # TODO send the new position to the engine
-        self.engine_evaluation.analyse(self.game_node)
+        self.engine_evaluation.evaluate(self.game_node)
 
     
