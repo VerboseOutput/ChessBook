@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget, QLabel, QGridLayout
+from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea
 from PySide2.QtCore import Qt
 import hichess
 from chess import pgn
@@ -41,7 +41,11 @@ class AnalysisPage(QWidget):
 
         # left side
         layout.addWidget(self.sq_board_widget, 0, 0)
-        layout.addWidget(self.engine_evaluation, 1, 0)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.engine_evaluation)
+        layout.addWidget(scroll, 1, 0)
 
         # right side
         layout.addWidget(self.move_notes, 0, 1, 2, 1)
