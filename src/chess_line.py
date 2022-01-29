@@ -5,13 +5,13 @@ from chess import pgn, WHITE, BLACK
 from flow_layout import FlowLayout
 
 class MoveWidget(QLabel):
-    def __init__(self) -> None:
+    def __init__(self, font_size: int) -> None:
         super().__init__()
 
         self.setText("")
         self.node = None
 
-        font = QFont("Monaco", 16, QFont.Bold)
+        font = QFont("Monaco", font_size, QFont.Bold)
         self.setFont(font)
 
     def set_node(self, node: pgn.ChildNode):
@@ -21,11 +21,11 @@ class MoveWidget(QLabel):
     def is_set(self) -> bool:
         return self.node is not None
 class TurnWidget(QWidget):
-    def __init__(self, moveNum: int) -> None:
+    def __init__(self, moveNum: int, font_size: int) -> None:
         super().__init__()
 
-        self.white_move = MoveWidget()
-        self.black_move = MoveWidget()
+        self.white_move = MoveWidget(font_size)
+        self.black_move = MoveWidget(font_size)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
@@ -33,7 +33,7 @@ class TurnWidget(QWidget):
         
         move_num = QLabel(str(moveNum) + ".")
         move_num.setStyleSheet("QLabel { color : #C0C0C0; }")
-        font = QFont("Monaco", 16)
+        font = QFont("Monaco", font_size)
         move_num.setFont(font)
         
         layout.addWidget(move_num)
@@ -54,8 +54,10 @@ class TurnWidget(QWidget):
 
     
 class LineWidget(QWidget):
-    def __init__(self, turn_num: int = 1) -> None:
+    def __init__(self, turn_num: int = 1, font_size: int = 16) -> None:
         super().__init__()
+
+        self.font_size = font_size
 
         self.turn_number = turn_num
         self.curr_turn = None
@@ -65,7 +67,7 @@ class LineWidget(QWidget):
 
     def add_move(self, node: pgn.ChildNode):
         if self.curr_turn is None:
-            self.curr_turn = TurnWidget(self.turn_number)
+            self.curr_turn = TurnWidget(self.turn_number, self.font_size)
             self.layout.addWidget(self.curr_turn)
 
         if node.turn() is BLACK: # means this node was WHITE'S move

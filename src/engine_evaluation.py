@@ -76,20 +76,21 @@ class EngineEvaluationWidget(QWidget):
 
                 if (relative_score is not None and 
                     pv is not None):
-
                     self.evaluation.emit(game_node, relative_score, pv, multipv)
         
     @Slot(chess.pgn.ChildNode, engine.PovScore, list, int)
     def update_evaluation(self, game_node, relative_score, pv, multipv):
-        v_index = multipv - 1
+        v_index = multipv - 1 # convert 1 indexed to 0 indexed
 
         white_score = relative_score.white() # always get the score from white's point of view
-        self.score[v_index].setText(str(white_score.score() / 100.0)) 
+        self.score[v_index].setText(str(white_score.score() / 100.0)) # convert from centipawns to pawns
 
         # replace the current line widget
+        font_size = 12
+        turn_num = game_node.board().fullmove_number
         dummy = QWidget()
         self.layout.replaceWidget(self.variation[v_index], dummy)
-        self.variation[v_index] = LineWidget()
+        self.variation[v_index] = LineWidget(turn_num, font_size)
         self.layout.replaceWidget(dummy, self.variation[v_index])
 
         eval_node = game_node
