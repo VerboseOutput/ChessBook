@@ -50,6 +50,10 @@ class AnalysisPage(QWidget):
         layout.setColumnStretch(0,1)
         layout.setColumnStretch(1,2)
 
+        # minimum size of board widget is 1/2 window height
+        # so that might affect any "rowStretch" settings you put here
+        # in unexpected ways
+
         self.setLayout(layout)
 
     def _on_move_made(self, _):
