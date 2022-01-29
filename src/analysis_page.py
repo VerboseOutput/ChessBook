@@ -46,6 +46,10 @@ class AnalysisPage(QWidget):
         # right side
         layout.addWidget(self.move_notes, 0, 1, 2, 1)
         
+        # set size policy
+        layout.setColumnStretch(0,1)
+        layout.setColumnStretch(1,2)
+
         self.setLayout(layout)
 
     def _on_move_made(self, _):
