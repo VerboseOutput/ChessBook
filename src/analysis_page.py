@@ -65,4 +65,10 @@ class AnalysisPage(QWidget):
         # TODO send the new position to the engine
         self.engine_evaluation.evaluate(self.game_node)
 
+    def resizeEvent(self, event):
+        widgetSize = event.size()
+
+        # required to keep the engine analysis lines from growing to take up
+        # the entire area. would love a better way to do this though
+        self.sq_board_widget.setMinimumSize(0, widgetSize.height() * 0.5)
     

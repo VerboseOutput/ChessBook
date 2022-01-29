@@ -2,7 +2,7 @@ import threading
 import asyncio
 import concurrent
 
-from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea
+from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea, QSizePolicy
 from PySide2.QtCore import Signal, Slot
 from chess import engine
 import chess
@@ -30,12 +30,10 @@ class EngineEvaluationWidget(QWidget):
 
         self.layout = QGridLayout()
 
-        self.score = [0] * EngineEvaluationWidget.variation_count
-        self.variation = [LineWidget()] * EngineEvaluationWidget.variation_count
-        for index in range(EngineEvaluationWidget.variation_count):
-            self.score[index] = QLabel("0")
-            self.variation[index] = LineWidget()
+        self.score = [QLabel("0") for x in range(EngineEvaluationWidget.variation_count)]
+        self.variation = [LineWidget() for x in range(EngineEvaluationWidget.variation_count)]
 
+        for index in range(EngineEvaluationWidget.variation_count):
             self.layout.addWidget(self.score[index], index, 0)
             self.layout.addWidget(self.variation[index], index, 1)
 

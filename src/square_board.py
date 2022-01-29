@@ -13,8 +13,6 @@ class SquareBoardWidget(QWidget):
 
         # resize it to be square and centered within its parent widget
         # this needs to happen before setting the board pixmap
-        board.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
         boardGeo = self._boardGeo(self.rect().width(), self.rect().height())
         board.setGeometry(boardGeo)
 
