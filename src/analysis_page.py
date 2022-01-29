@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget, QLabel, QGridLayout
+from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea
 from PySide2.QtCore import Qt
 import hichess
 from chess import pgn
@@ -41,11 +41,23 @@ class AnalysisPage(QWidget):
 
         # left side
         layout.addWidget(self.sq_board_widget, 0, 0)
-        layout.addWidget(self.engine_evaluation, 1, 0)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.engine_evaluation)
+        layout.addWidget(scroll, 1, 0)
 
         # right side
         layout.addWidget(self.move_notes, 0, 1, 2, 1)
         
+        # set size policy
+        layout.setColumnStretch(0,1)
+        layout.setColumnStretch(1,2)
+
+        # minimum size of board widget is 1/2 window height
+        # so that might affect any "rowStretch" settings you put here
+        # in unexpected ways
+
         self.setLayout(layout)
 
     def _on_move_made(self, _):
@@ -61,4 +73,10 @@ class AnalysisPage(QWidget):
         # TODO send the new position to the engine
         self.engine_evaluation.evaluate(self.game_node)
 
+    def resizeEvent(self, event):
+        widgetSize = event.size()
+
+        # required to keep the engine analysis lines from growing to take up
+        # the entire area. would love a better way to do this though
+        self.sq_board_widget.setMinimumSize(0, widgetSize.height() * 0.5)
     

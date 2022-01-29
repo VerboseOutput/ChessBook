@@ -2,7 +2,7 @@ import threading
 import asyncio
 import concurrent
 
-from PySide2.QtWidgets import QWidget, QLabel, QGridLayout
+from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea, QSizePolicy
 from PySide2.QtCore import Signal, Slot
 from chess import engine
 import chess
@@ -30,16 +30,15 @@ class EngineEvaluationWidget(QWidget):
 
         self.layout = QGridLayout()
 
-        self.score = [0] * EngineEvaluationWidget.variation_count
-        self.variation = [LineWidget()] * EngineEvaluationWidget.variation_count
-        for index in range(EngineEvaluationWidget.variation_count):
-            self.score[index] = QLabel("0")
-            self.variation[index] = LineWidget()
+        self.score = [QLabel("0") for x in range(EngineEvaluationWidget.variation_count)]
+        self.variation = [LineWidget() for x in range(EngineEvaluationWidget.variation_count)]
 
+        for index in range(EngineEvaluationWidget.variation_count):
             self.layout.addWidget(self.score[index], index, 0)
             self.layout.addWidget(self.variation[index], index, 1)
 
-        #self.layout.setColumnStretch(1,1) # give more room to the lines than the scores
+        # set size policy
+        self.layout.setColumnStretch(1,1) # give more room to the lines than the scores
 
         self.setLayout(self.layout)
 
@@ -70,17 +69,14 @@ class EngineEvaluationWidget(QWidget):
         board = game_node.board()
         # wait on event which sets the position to be analyzed
         with await self.engine.analysis(board, multipv=3) as analysis:
-            curr_pv_len = [0] * EngineEvaluationWidget.variation_count
             async for info in analysis:
                 relative_score = info.get("score")
                 pv = info.get("pv")
                 multipv = info.get("multipv") # 1 indexed based, NOT 0
 
                 if (relative_score is not None and 
-                    pv is not None and
-                    len(pv) >= curr_pv_len[multipv-1]):
+                    pv is not None):
 
-                    curr_pv_len[multipv-1] = len(pv)
                     self.evaluation.emit(game_node, relative_score, pv, multipv)
         
     @Slot(chess.pgn.ChildNode, engine.PovScore, list, int)
