@@ -3,6 +3,7 @@ from PySide2.QtCore import Qt
 import hichess
 from chess import pgn
 from chess import engine
+from chess_line import MoveWidget
 from engine_evaluation import EngineEvaluationWidget
 from move_notes import MoveNotesWidget
 
@@ -20,6 +21,7 @@ class AnalysisPage(QWidget):
         # each node can return a chess.Board representation of the current state
         # add a new move after the current one using add_variation()
         self.game_node = pgn.Game()
+        self.activeMove = None
 
         # Setup Board Widget
         self.sq_board_widget = SquareBoardWidget()
@@ -67,11 +69,13 @@ class AnalysisPage(QWidget):
         move = self.sq_board_widget.peek_move()
         self.game_node = self.game_node.add_variation(move)
 
-        # update our notes with the latest move
-        self.move_notes.add_move(self.game_node)
-
-        # TODO send the new position to the engine
+        # send the new position to the engine
         self.engine_evaluation.evaluate(self.game_node)
+
+        # update our notes with the latest move
+        new_move_widget = self.move_notes.add_move(self.game_node)
+        self.set_active(new_move_widget)
+        
 
     def resizeEvent(self, event):
         widgetSize = event.size()
@@ -79,4 +83,11 @@ class AnalysisPage(QWidget):
         # required to keep the engine analysis lines from growing to take up
         # the entire area. would love a better way to do this though
         self.sq_board_widget.setMinimumSize(0, widgetSize.height() * 0.5)
+
+    def set_active(self, move_widget: MoveWidget) -> None:
+        if self.activeMove is not None:
+            self.activeMove.deselect()
+
+        self.activeMove = move_widget
+        move_widget.select()
     

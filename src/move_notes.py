@@ -2,7 +2,7 @@ from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSizePo
 from PySide2.QtGui import QPainter, QColor, QFont, QFontDatabase
 from chess import pgn, WHITE, BLACK
 
-from chess_line import LineWidget
+from chess_line import LineWidget, MoveWidget
 
 class MoveNotesWidget(QWidget):
     def __init__(self) -> None:
@@ -17,7 +17,7 @@ class MoveNotesWidget(QWidget):
 
         self.setLayout(self.layout)
 
-    def add_move(self, node: pgn.ChildNode):
-        self.curr_line.add_move(node)
+    def add_move(self, node: pgn.ChildNode) -> MoveWidget:
+        return self.curr_line.add_move(node)
 
 
