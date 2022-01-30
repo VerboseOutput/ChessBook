@@ -1,5 +1,6 @@
 from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSizePolicy, QGridLayout
 from PySide2.QtGui import QPainter, QColor, QFont, QPalette
+from PySide2.QtCore import Qt
 from chess import pgn, WHITE, BLACK
 
 from flow_layout import FlowLayout
@@ -19,6 +20,9 @@ class MoveWidget(QLabel):
         self.setAutoFillBackground(True)
         self.default_background = self.palette().color(self.backgroundRole())
         self.selected_color = QColor(100, 100, 100)
+        self.hover_color = QColor(75, 75, 75)
+
+        self.setAttribute(Qt.WA_Hover, True)
 
     def set_node(self, node: pgn.ChildNode):
         self.node = node
@@ -39,6 +43,14 @@ class MoveWidget(QLabel):
         pal = self.palette()
         pal.setColor(QPalette.Background, color)
         self.setPalette(pal)
+
+    def enterEvent(self, _):
+        if not self.selected:
+            self.set_background(self.hover_color)
+
+    def leaveEvent(self, _):
+        if not self.selected:
+            self.set_background(self.default_background)
 
 class TurnWidget(QWidget):
     def __init__(self, moveNum: int, font_size: int) -> None:
