@@ -1,11 +1,14 @@
+from typing import Any
 from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSizePolicy, QGridLayout
 from PySide2.QtGui import QPainter, QColor, QFont, QPalette
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Signal, Slot
 from chess import pgn, WHITE, BLACK
 
 from flow_layout import FlowLayout
 
 class MoveWidget(QLabel):
+    clicked = Signal(QWidget)
+
     def __init__(self, font_size: int) -> None:
         super().__init__()
 
@@ -15,11 +18,11 @@ class MoveWidget(QLabel):
         font = QFont("Monaco", font_size, QFont.Bold)
         self.setFont(font)
 
-        self.selected = False
+        self.active = False
 
         self.setAutoFillBackground(True)
         self.default_background = self.palette().color(self.backgroundRole())
-        self.selected_color = QColor(100, 100, 100)
+        self.active_color = QColor(100, 100, 100)
         self.hover_color = QColor(75, 75, 75)
 
         self.setAttribute(Qt.WA_Hover, True)
@@ -32,11 +35,11 @@ class MoveWidget(QLabel):
         return self.node is not None
 
     def select(self):
-        self.selected = True
-        self.set_background(self.selected_color)
+        self.active = True
+        self.set_background(self.active_color)
 
     def deselect(self):
-        self.selected = False
+        self.active = False
         self.set_background(self.default_background)
 
     def set_background(self, color):
@@ -44,13 +47,22 @@ class MoveWidget(QLabel):
         pal.setColor(QPalette.Background, color)
         self.setPalette(pal)
 
+    # mouse hover event overrides
+
     def enterEvent(self, _):
-        if not self.selected:
+        if not self.active:
             self.set_background(self.hover_color)
 
     def leaveEvent(self, _):
-        if not self.selected:
+        if not self.active:
             self.set_background(self.default_background)
+
+    # mouse press event overrides
+    def mouseReleaseEvent(self, event):
+        selected = self.rect().contains(event.pos())
+        if selected and not self.active:
+            print("CLICK")
+            self.clicked.emit(self)
 
 class TurnWidget(QWidget):
     def __init__(self, moveNum: int, font_size: int) -> None:
