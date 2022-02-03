@@ -7,7 +7,7 @@ from chess import pgn, WHITE, BLACK
 from flow_layout import FlowLayout
 
 class MoveWidget(QLabel):
-    clicked = Signal(QWidget)
+    clicked = Signal(QWidget) # TODO this should be MoveWidget somehow, not QWidget
 
     def __init__(self, font_size: int) -> None:
         super().__init__()
@@ -61,7 +61,6 @@ class MoveWidget(QLabel):
     def mouseReleaseEvent(self, event):
         selected = self.rect().contains(event.pos())
         if selected and not self.active:
-            print("CLICK")
             self.clicked.emit(self)
 
 class TurnWidget(QWidget):
@@ -96,6 +95,7 @@ class TurnWidget(QWidget):
             self.white_move.setText("...")
         self.black_move.set_node(node)
         return self.black_move
+        
 class LineWidget(QWidget):
     def __init__(self, turn_num: int = 1, font_size: int = 16) -> None:
         super().__init__()

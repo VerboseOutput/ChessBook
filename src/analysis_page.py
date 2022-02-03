@@ -1,5 +1,7 @@
+from tokenize import String
 from PySide2.QtWidgets import QWidget, QLabel, QGridLayout, QScrollArea
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Slot
+
 import hichess
 from chess import pgn
 from chess import engine
@@ -8,7 +10,6 @@ from engine_evaluation import EngineEvaluationWidget
 from move_notes import MoveNotesWidget
 
 from square_board import SquareBoardWidget
-
 
 class AnalysisPage(QWidget):
     def __init__(self) -> None:
@@ -21,7 +22,6 @@ class AnalysisPage(QWidget):
         # each node can return a chess.Board representation of the current state
         # add a new move after the current one using add_variation()
         self.game_node = pgn.Game()
-        self.activeMove = None
 
         # Setup Board Widget
         self.sq_board_widget = SquareBoardWidget()
@@ -37,6 +37,7 @@ class AnalysisPage(QWidget):
        
        # Setup notes and move recorder
         self.move_notes = MoveNotesWidget()
+        self.move_notes.update_position.connect(self.on_update_position)
     
         # layout the page's widgets
         layout = QGridLayout()
@@ -70,13 +71,19 @@ class AnalysisPage(QWidget):
         self.game_node = self.game_node.add_variation(move)
 
         # send the new position to the engine
-        self.engine_evaluation.evaluate(self.game_node)
+        self.engine_evaluation.evaluate(self.game_node.board())
 
         # update our notes with the latest move
-        new_move_widget = self.move_notes.add_move(self.game_node)
-        self.set_active(new_move_widget)
-        
+        self.move_notes.add_move(self.game_node)
 
+    @Slot(str)
+    def on_update_position(self, fen):
+        board_widget = self.sq_board_widget.board_widget
+        board_widget.clear()
+        board_widget.setFen(fen)
+
+        self.engine_evaluation.evaluate(board_widget.board)
+        
     def resizeEvent(self, event):
         widgetSize = event.size()
 
@@ -84,10 +91,5 @@ class AnalysisPage(QWidget):
         # the entire area. would love a better way to do this though
         self.sq_board_widget.setMinimumSize(0, widgetSize.height() * 0.5)
 
-    def set_active(self, move_widget: MoveWidget) -> None:
-        if self.activeMove is not None:
-            self.activeMove.deselect()
-
-        self.activeMove = move_widget
-        move_widget.select()
+    
     

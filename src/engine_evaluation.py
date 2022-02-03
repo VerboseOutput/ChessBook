@@ -12,7 +12,7 @@ from rich import print
 from chess_line import LineWidget
 
 class EngineEvaluationWidget(QWidget):
-    evaluation = Signal(chess.pgn.ChildNode, engine.PovScore, list, int)
+    evaluation = Signal(chess.Board, engine.PovScore, list, int)
     variation_count = 3
 
     def __init__(self) -> None:
@@ -59,14 +59,13 @@ class EngineEvaluationWidget(QWidget):
         else:
             print(f'The coroutine returned: {type(self.engine)}')
 
-    def evaluate(self, game_node):
+    def evaluate(self, board):
         if self.analyze_task is not None:
             self.analyze_task.cancel()
                
-        self.analyze_task = asyncio.run_coroutine_threadsafe(self.analyze(game_node), self.event_loop)        
+        self.analyze_task = asyncio.run_coroutine_threadsafe(self.analyze(board), self.event_loop)        
 
-    async def analyze(self, game_node):
-        board = game_node.board()
+    async def analyze(self, board):
         # wait on event which sets the position to be analyzed
         with await self.engine.analysis(board, multipv=3) as analysis:
             async for info in analysis:
@@ -76,10 +75,10 @@ class EngineEvaluationWidget(QWidget):
 
                 if (relative_score is not None and 
                     pv is not None):
-                    self.evaluation.emit(game_node, relative_score, pv, multipv)
+                    self.evaluation.emit(board, relative_score, pv, multipv)
         
-    @Slot(chess.pgn.ChildNode, engine.PovScore, list, int)
-    def update_evaluation(self, game_node, relative_score, pv, multipv):
+    @Slot(chess.Board, engine.PovScore, list, int)
+    def update_evaluation(self, board, relative_score, pv, multipv):
         v_index = multipv - 1 # convert 1 indexed to 0 indexed
 
         white_score = relative_score.white() # always get the score from white's point of view
@@ -87,16 +86,17 @@ class EngineEvaluationWidget(QWidget):
 
         # replace the current line widget
         font_size = 12
-        turn_num = game_node.board().fullmove_number
+        turn_num = board.fullmove_number
         dummy = QWidget()
         self.layout.replaceWidget(self.variation[v_index], dummy)
         self.variation[v_index] = LineWidget(turn_num, font_size)
         self.layout.replaceWidget(dummy, self.variation[v_index])
 
-        eval_node = game_node
+        node = chess.pgn.Game()
+        node.setup(board)
         for move in pv:
-            eval_node = eval_node.add_variation(move)
-            self.variation[v_index].add_move(eval_node)
+            node = node.add_variation(move)
+            self.variation[v_index].add_move(node)
 
 
     
